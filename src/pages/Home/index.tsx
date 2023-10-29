@@ -9,7 +9,14 @@ function Home() {
           <label htmlFor='task'>Vou trabalhar em: </label>
           <input type='text' name='' id='task' />
           <label htmlFor='minutesAmount'>durante </label>
-          <input type='number' name='' id='minutesAmount' />
+          <input
+            type='number'
+            name=''
+            id='minutesAmount'
+            step={5}
+            min={5}
+            max={60}
+          />
           <span>minutos.</span>
         </div>
 
