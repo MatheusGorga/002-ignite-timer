@@ -72,7 +72,7 @@ export const Status = styled.span<StatusProps>`
   align-items: center;
   gap: 0.5rem;
 
-  &::before {
+  &::after {
     content: '';
     width: 0.5rem;
     height: 0.5rem;
