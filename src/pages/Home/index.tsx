@@ -6,7 +6,6 @@ import {
 } from './styles';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as zod from 'zod';
 import {
   FormContainer,
   MinutesAmountInput,
@@ -17,19 +16,6 @@ import { CountdownContainer, Separator } from './components/CountDown/styles';
 import { differenceInSeconds } from 'date-fns';
 import NewCycleForm from './components/NewCycleForm';
 import CountDown from './components/CountDown';
-
-const newCycleFormValidationSchema = zod.object({
-  task: zod.string().min(1, 'Informe a tarefa para inciar um ciclo'),
-  minutesAmount: zod.number().min(5).max(60),
-});
-
-/* interface NewCycleFormData {
-  task: string;
-  minutesAmount: number;
-}
- */
-
-type NewCycleFormData = zod.infer<typeof newCycleFormValidationSchema>;
 
 interface Cycle {
   id: string;
@@ -43,15 +29,6 @@ interface Cycle {
 function Home() {
   const [cycles, setCycles] = useState<Cycle[]>([]);
   const [activeCycleId, setActiveCycleId] = useState<string | null>(null);
-  const [amountSecondsPassed, setAmoutSecondsPassed] = useState(0);
-
-  const { register, handleSubmit, watch, reset } = useForm<NewCycleFormData>({
-    resolver: zodResolver(newCycleFormValidationSchema),
-    defaultValues: {
-      task: '',
-      minutesAmount: 0,
-    },
-  });
 
   function handleCreateNewCycle(data: NewCycleFormData) {
     const id = String(new Date().getTime());
@@ -84,7 +61,6 @@ function Home() {
   }
 
   const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId);
-  const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0;
   const currentSeconds = activeCycle ? totalSeconds - amountSecondsPassed : 0;
   const minutesAmount = Math.floor(currentSeconds / 60);
   const secondsAmount = currentSeconds % 60;
@@ -93,37 +69,6 @@ function Home() {
 
   const task = watch('task');
   const isSubmitDisabled = !task;
-
-  useEffect(() => {
-    let interval: number;
-    if (activeCycle) {
-      interval = setInterval(() => {
-        const secondsDifference = differenceInSeconds(
-          new Date(),
-          activeCycle.startDate
-        );
-        if (secondsDifference >= totalSeconds) {
-          setCycles((state) =>
-            state.map((cycle) => {
-              if (cycle.id === activeCycleId) {
-                return { ...cycle, finishedDate: new Date() };
-              } else {
-                return cycle;
-              }
-            })
-          );
-          setAmoutSecondsPassed(totalSeconds);
-          clearInterval(interval);
-        } else {
-          setAmoutSecondsPassed(secondsDifference);
-        }
-      }, 1000);
-    }
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, [activeCycle, activeCycleId, totalSeconds]);
 
   useEffect(() => {
     if (activeCycle) {
